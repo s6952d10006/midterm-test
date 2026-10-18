@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="th" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Amazing Thailand</title>
+    
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Load Google Fonts (Prompt) -->
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Load FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Load Leaflet CSS & JS สำหรับแผนที่ -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+
+    <!-- Tailwind Config สำหรับ Custom Colors -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Prompt', 'sans-serif'],
+                    },
+                    colors: {
+                        thai: {
+                            gold: '#D4AF37',
+                            goldlight: '#F3E5AB',
+                            blue: '#1E3A8A',
+                            bluelight: '#3B82F6',
+                            green: '#059669',
+                            greenlight: '#10B981',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* Custom Styles & Animations */
+        body { font-family: 'Prompt', sans-serif; }
+        .hero-bg {
+            background-image: linear-gradient(rgba(30, 58, 138, 0.7), rgba(5, 150, 105, 0.6)), url('https://images.unsplash.com/photo-1552465011-b4e21bf6e79a?auto=format&fit=crop&q=80&w=1920');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+        }
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+        .card-hover:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+        .fade-in {
+            animation: fadeIn 0.5s ease-in-out forwards;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        /* ซ่อน Scrollbar สำหรับ Filter */
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800">
+
+    <!-- Navbar แบบ Glassmorphism โปร่งแสง -->
+    <div class="fixed top-0 inset-x-0 z-50 pt-4 px-4 pointer-events-none">
+        <nav id="navbar-box" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 bg-white/10 backdrop-blur-md border border-white/20 rounded-full shadow-sm transition-all duration-300 pointer-events-auto">
+            <div class="flex justify-between items-center h-14 md:h-16">
+                <div class="flex-shrink-0 flex items-center gap-2 cursor-pointer">
+                    <i class="fa-solid fa-elephant text-thai-gold text-2xl md:text-3xl"></i>
+                    <span class="text-white font-bold text-lg md:text-2xl tracking-wide drop-shadow-md">Amazing Thailand</span>
+                </div>
+                <div class="hidden md:flex space-x-8">
+                    <a href="#destinations" class="text-white hover:text-thai-gold transition font-medium drop-shadow-md">จุดหมายปลายทาง</a>
+                    <a href="#map-section" class="text-white hover:text-thai-gold transition font-medium drop-shadow-md">แผนที่และการนำทาง</a>
+                    <a href="#ai-planner" class="text-white hover:text-thai-gold transition font-medium drop-shadow-md">AI วางแผนเที่ยว</a>
+                </div>
+            </div>
+        </nav>
+    </div>
+
+    <section class="hero-bg min-h-screen flex items-center justify-center relative">
+        <div class="text-center px-4 max-w-4xl mx-auto relative z-10 fade-in">
+            <span class="px-4 py-1 rounded-full bg-thai-gold/20 text-thai-gold border border-thai-gold/50 text-sm font-semibold mb-6 inline-block backdrop-blur-sm">
+                ท่องเที่ยววิถีไทย มนต์เสน่ห์ไม่รู้ลืม
+            </span>
+            <h1 class="text-4xl md:text-6xl lg:text-7xl font-bold text-white mb-6 leading-tight drop-shadow-lg">
+                Amazing Thailand <br> <span class="text-thai-gold">1 ภาค 1 จังหวัด ไม่ไปไม่รู้</span>
+            </h1>
+            <p class="text-lg md:text-xl text-gray-200 mb-10 max-w-2xl mx-auto drop-shadow-md">
+                สัมผัสความงามของ 6 ภูมิภาค 6 จังหวัดไฮไลท์ของประเทศไทย ที่เต็มไปด้วยธรรมชาติ วัฒนธรรม และอาหารที่รอให้คุณไปค้นหา
+            </p>
+            <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                <a href="#destinations" class="px-8 py-4 bg-thai-gold text-white rounded-full font-bold hover:bg-yellow-600 transition shadow-lg flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-map-location-dot"></i> เริ่มต้นค้นหา
+                </a>
+                <a href="#map-section" class="px-8 py-4 bg-white/10 backdrop-blur-md border border-white/30 text-white rounded-full font-bold hover:bg-white/20 transition shadow-lg flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-location-crosshairs"></i> แผนที่นำทาง
+                </a>
+                <a href="#ai-planner" class="px-8 py-4 bg-white/10 backdrop-blur-md border border-white/30 text-white rounded-full font-bold hover:bg-white/20 transition shadow-lg flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-robot"></i> AI จัดทริปให้
+                </a>
+            </div>
+        </div>
+        
+        <!-- Scroll Indicator -->
+        <div class="absolute bottom-10 left-1/2 transform -translate-x-1/2 animate-bounce">
+            <a href="#destinations" class="text-white/70 hover:text-white transition">
+                <i class="fa-solid fa-chevron-down text-3xl"></i>
+            </a>
+        </div>
+    </section>
+
+    <script>
+        const destinations = [
+            {
+                id: 'north',
+                region: 'ภาคเหนือ',
+                icon: '🌲',
+                name: 'น่าน',
+                slogan: 'กระซิบรักเมืองน่าน นั่งจิบกาแฟชมวิวดอย',
+                time: 'ปลายฝนต้นหนาว (พ.ย. - ก.พ.)',
+                attractions: ['วัดภูมินทร์ (ปู่ม่านย่าม่าน)', 'ถนนเลข 3 (ถนนลอยฟ้า)', 'อำเภอปัว & บ่อเกลือภูเขาโบราณ'],
+                food: ['ข้าวซอยไก่โบราณ', 'ไส้อั่วสมุนไพรน่าน', 'น้ำพริกหนุ่ม แคบหมู'],
+                lodging: ['โฮมสเตย์ปัว', 'ที่พักบ่อเกลือ', 'จุดชมวิวดอยภูคา', 'ดอยเสมอดาว'],
+                img: './image/tarvel1.jpg',
+                color: 'bg-emerald-600',
+                lat: 18.7756,
+                lng: 100.7730
+            },
+            {
+                id: 'northeast',
+                region: 'ภาคอีสาน',
+                icon: '🌾',
+                name: 'เลย',
+                slogan: 'สัมผัสอากาศหนาวภูเรือ เดินชิลภูกระดึง และผาหล่มสัก',
+                time: 'ฤดูหนาว (ต.ค. - ก.พ.)',
+                attractions: ['อุทยานแห่งชาติภูกระดึง (ผาหล่มสัก)', 'ถนนคนเดินเชียงคาน', 'ภูเรือ & สกายวอล์คเชียงคาน'],
+                food: ['ต้มเส้นเชียงคาน', 'กุ้งฝอยทอดริมโขง', 'ตำซั่วเลย'],
+                lodging: ['บ้านไม้เก่าโฮมสเตย์เชียงคาน', 'จุดชมวิวภูทอก', 'สกายวอล์คเชียงคาน'],
+                img: './image/tarvel3.jpg',
+                color: 'bg-orange-600',
+                lat: 17.4860,
+                lng: 101.7223
+            },
+            {
+                id: 'central',
+                region: 'ภาคกลาง',
+                icon: '🏛️',
+                name: 'พระนครศรีอยุธยา',
+                slogan: 'ตามรอยประวัติศาสตร์ มรดกโลกทรงคุณค่า และกุ้งแม่น้ำเผา',
+                time: 'เที่ยวได้ตลอดปี (แนะนำ พ.ย. - ม.ค.)',
+                attractions: ['วัดมหาธาตุ (เศียรพระพุทธรูป)', 'วัดไชยวัฒนาราม', 'วัดพระศรีสรรเพชญ์'],
+                food: ['กุ้งแม่น้ำเผาตัวโต', 'โรตีสายไหม', 'ก๋วยเตี๋ยวเรือสูตรดั้งเดิม'],
+                lodging: ['โรงแรมริมแม่น้ำเจ้าพระยา', 'จุดชมวิววัดไชยวัฒนาราม'],
+                img: './image/tarvel2.jpg',
+                color: 'bg-red-700',
+                lat: 14.3532,
+                lng: 100.5689
+            },
+            {
+                id: 'east',
+                region: 'ภาคตะวันออก',
+                icon: '🌊',
+                name: 'ตราด',
+                slogan: 'มนต์เสน่ห์เกาะช้าง ทะเลตราด มัลดีฟส์เมืองไทย',
+                time: 'ฤดูท่องเที่ยวทะเล (พ.ย. - พ.ค.)',
+                attractions: ['เกาะกูด (น้ำใสราวกับกระจก)', 'อุทยานแห่งชาติหมู่เกาะช้าง', 'เกาะขาม (หาดทรายขาว)'],
+                food: ['ก๋วยเตี๋ยวกั้งตราด', 'ปูม้านึ่งสด', 'ข้าวคลุกพริกเกลือ'],
+                lodging: ['รีสอร์ทติดหาดเกาะกูด', 'จุดชมวิวไก่แบ้ เกาะช้าง', 'ประภาคารเกาะช้าง'],
+                img: './image/tarvel6.jpg',
+                color: 'bg-cyan-600',
+                lat: 12.2428,
+                lng: 102.5175
+            },
+            {
+                id: 'west',
+                region: 'ภาคตะวันตก',
+                icon: '⛰️',
+                name: 'กาญจนบุรี',
+                slogan: 'ย้อนรอยสะพานข้ามแม่น้ำแคว นอนแพลอยน้ำสายน้ำแคว',
+                time: 'เที่ยวได้ทั้งปี (ปลายฝนต้นหนาวสวยสุด)',
+                attractions: ['สะพานข้ามแม่น้ำแคว', 'น้ำตกเอราวัณ (มรกต 7 ชั้น)', 'สังขละบุรี (สะพานมอญ)'],
+                food: ['แกงป่าเมืองกาญจน์', 'ปลาคังลวกจิ้ม', 'แกงคั่วหอยขม'],
+                lodging: ['แพพักลอยน้ำแม่น้ำแคว', 'จุดชมวิวเนินช้างศึก', 'ทางรถไฟสายมรณะ'],
+                img: './image/tarvel4.jpg',
+                color: 'bg-green-700',
+                lat: 14.0041,
+                lng: 99.5332
+            },
+            {
+                id: 'south',
+                region: 'ภาคใต้',
+                icon: '🏝️',
+                name: 'กระบี่',
+                slogan: 'มรกตแห่งอันดามัน เขาขนาบน้ำ และหาดไร่เลย์',
+                time: 'ฤดูท่องเที่ยวอันดามัน (พ.ย. - เม.ย.)',
+                attractions: ['หาดไร่เลย์ & ถ้ำพระนาง', 'สระมรกต & น้ำตกร้อน', 'หมู่เกาะพีพี & อ่าวมาหยา'],
+                food: ['ขนมจีนน้ำยาปู', 'คั่วกลิ้งหมูใต้', 'หอยชักตีนลวก'],
+                lodging: ['รีสอร์ทหรูหาดอ่าวนาง', 'จุดชมวิวเขาหงอนนก', 'จุดชมวิววัดถ้ำเสือ'],
+                img: './image/tarvel5.jpg',
+                color: 'bg-blue-600',
+                lat: 8.0863,
+                lng: 98.9063
+            }
+        ];
+    </script>
+
+    <section id="destinations" class="py-20 px-4 max-w-7xl mx-auto">
+        <div class="text-center mb-12">
+            <h2 class="text-3xl md:text-4xl font-bold text-thai-blue mb-4">จุดหมายปลายทางแนะนำ</h2>
+            <p class="text-gray-600 max-w-2xl mx-auto">เลือกภูมิภาคที่คุณสนใจ เพื่อค้นพบเสน่ห์ที่แตกต่างกันของแต่ละจังหวัด</p>
+        </div>
+
+        <!-- Interactive Region Filter -->
+        <div class="flex overflow-x-auto no-scrollbar gap-3 mb-12 pb-4 justify-start lg:justify-center px-2" id="filter-container">
+            <button onclick="filterCards('all')" id="btn-all" class="filter-btn active whitespace-nowrap px-6 py-3 rounded-full bg-thai-blue text-white font-medium shadow-md transition transform hover:scale-105 focus:outline-none">
+                🌟 ทั้งหมด
+            </button>
+            <!-- ปุ่มอื่นๆ จะถูกสร้างด้วย JavaScript -->
+        </div>
+
+        <!-- Destination Cards Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8" id="cards-container">
+            <!-- Cards จะถูก Render ด้วย JavaScript ที่นี่ -->
+        </div>
+    </section>
+
+    <section id="map-section" class="py-20 px-4 bg-white relative">
+        <div class="max-w-7xl mx-auto">
+            <div class="text-center mb-10">
+                <h2 class="text-3xl md:text-4xl font-bold text-thai-blue mb-4">แผนที่และการนำทาง</h2>
+                <p class="text-gray-600 max-w-2xl mx-auto mb-6">สำรวจจุดหมายปลายทางและสถานที่ท่องเที่ยวบนแผนที่ประเทศไทย</p>
+            </div>
+
+            <!-- Map Container -->
+            <div class="rounded-3xl overflow-hidden shadow-2xl border-4 border-gray-100 relative">
+                <div id="thailand-map" class="w-full h-[500px] z-10"></div>
+            </div>
+        </div>
+    </section>
+
+    <section id="ai-planner" class="py-20 bg-thai-blue text-white relative overflow-hidden">
+        <!-- Background Pattern -->
+        <div class="absolute inset-0 opacity-10" style="background-image: url('data:image/svg+xml,%3Csvg width=\'60\' height=\'60\' viewBox=\'0 0 60 60\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cg fill=\'none\' fill-rule=\'evenodd\'%3E%3Cg fill=\'%23ffffff\' fill-opacity=\'1\'%3E%3Cpath d=\'M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z\'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E');"></div>
+        
+        <div class="max-w-5xl mx-auto px-4 relative z-10">
+            <div class="text-center mb-12">
+                <div class="inline-block p-4 rounded-full bg-white/10 backdrop-blur-sm mb-4">
+                    <i class="fa-solid fa-wand-magic-sparkles text-thai-gold text-4xl"></i>
+                </div>
+                <h2 class="text-3xl md:text-4xl font-bold mb-4">AI Travel Planner Assistant</h2>
+                <p class="text-blue-200">ให้ AI ช่วยออกแบบทริปที่ใช่ สำหรับสไตล์การเที่ยวของคุณ</p>
+            </div>
+
+            <div class="bg-white rounded-3xl p-6 md:p-10 shadow-2xl text-gray-800 max-w-4xl mx-auto">
+                <form id="ai-form" class="space-y-6">
+                    <div id="ai-error" class="hidden bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-xl mb-4" role="alert">
+                        <strong class="font-bold">ข้อผิดพลาด: </strong>
+                        <span class="block sm:inline" id="ai-error-text">กรุณากรอกข้อมูลให้ครบถ้วน</span>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <!-- เลือกจังหวัด -->
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">จุดหมายปลายทาง</label>
+                            <div class="relative">
+                                <select id="ai-region" class="w-full appearance-none border border-gray-300 rounded-xl px-4 py-3 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-thai-blue/50 focus:border-thai-blue transition cursor-pointer">
+                                    <option value="" disabled selected>เลือกจังหวัดที่ต้องการไป...</option>
+                                    <option value="น่าน">น่าน (ภาคเหนือ)</option>
+                                    <option value="เลย">เลย (ภาคอีสาน)</option>
+                                    <option value="พระนครศรีอยุธยา">พระนครศรีอยุธยา (ภาคกลาง)</option>
+                                    <option value="ตราด">ตราด (ภาคตะวันออก)</option>
+                                    <option value="กาญจนบุรี">กาญจนบุรี (ภาคตะวันตก)</option>
+                                    <option value="กระบี่">กระบี่ (ภาคใต้)</option>
+                                </select>
+                                <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-gray-500">
+                                    <i class="fa-solid fa-chevron-down"></i>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- เลือกสไตล์การท่องเที่ยว -->
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">สไตล์การท่องเที่ยว</label>
+                            <div class="relative">
+                                <select id="ai-style" class="w-full appearance-none border border-gray-300 rounded-xl px-4 py-3 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-thai-blue/50 focus:border-thai-blue transition cursor-pointer">
+                                    <option value="" disabled selected>เลือกสไตล์ที่คุณชอบ...</option>
+                                    <option value="nature">สายธรรมชาติ🌿(ป่า,เขา,ทะเล)</option>
+                                    <option value="food">สายกิน🍽️(ตระเวนชิมของอร่อย)</option>
+                                    <option value="culture">สายชิล & วัฒนธรรม📸(ถ่ายรูป,วัด,คาเฟ่)</option>
+                                </select>
+                                <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-gray-500">
+                                    <i class="fa-solid fa-chevron-down"></i>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- เลือกระยะเวลา (ส่วนที่เพิ่มใหม่) -->
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">ระยะเวลาเดินทาง</label>
+                            <div class="relative">
+                                <select id="ai-days" class="w-full appearance-none border border-gray-300 rounded-xl px-4 py-3 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-thai-blue/50 focus:border-thai-blue transition cursor-pointer">
+                                    <option value="" disabled selected>เลือกจำนวนวัน...</option>
+                                    <option value="1 วัน (ไปเช้าเย็นกลับ)">1 วัน (ไปเช้าเย็นกลับ)</option>
+                                    <option value="2 วัน 1 คืน">2 วัน 1 คืน</option>
+                                    <option value="3 วัน 2 คืน">3 วัน 2 คืน</option>
+                                    <option value="4 วัน 3 คืน">4 วัน 3 คืน</option>
+                                    <option value="5 วันขึ้นไป">5 วันขึ้นไป</option>
+                                </select>
+                                <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-gray-500">
+                                    <i class="fa-solid fa-chevron-down"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="pt-4 flex justify-center">
+                        <button type="submit" class="bg-gradient-to-r from-thai-blue to-thai-green text-white font-bold py-3 px-8 rounded-full shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition flex items-center gap-2">
+                            <i class="fa-solid fa-bolt"></i> สร้างแผนการเดินทาง
+                        </button>
+                    </div>
+                </form>
+
+                <!-- Loading State -->
+                <div id="ai-loading" class="hidden mt-10 text-center py-10">
+                    <div class="inline-block animate-spin rounded-full h-12 w-12 border-t-4 border-b-4 border-thai-blue mb-4"></div>
+                    <p class="text-gray-500 font-medium animate-pulse">AI กำลังประมวลผลแผนการเดินทางที่ดีที่สุดสำหรับคุณ...</p>
+                </div>
+
+                <!-- Result State -->
+                <div id="ai-result" class="hidden mt-10 border-t border-gray-200 pt-8">
+                    <div class="bg-gray-50 rounded-2xl p-6 border border-gray-100 shadow-inner">
+                        <div class="flex items-center gap-3 mb-4">
+                            <div class="bg-thai-gold w-10 h-10 rounded-full flex items-center justify-center text-white">
+                                <i class="fa-solid fa-robot"></i>
+                            </div>
+                            <h3 class="text-xl font-bold text-gray-800">แผนเที่ยวแนะนำของคุณมาแล้ว! 🎉</h3>
+                        </div>
+                        <div id="ai-response-content" class="text-gray-700 space-y-4 leading-relaxed">
+                            <!-- เนื้อหาจะถูกแทรกด้วย JS -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="bg-gray-900 text-gray-400 py-10 text-center">
+        <div class="max-w-7xl mx-auto px-4">
+            <div class="flex justify-center items-center gap-2 mb-4">
+                <i class="fa-solid fa-elephant text-thai-gold text-2xl"></i>
+                <span class="text-white font-bold text-xl">Amazing Thailand</span>
+            </div>
+            <p class="mb-4">1 ภาค 1 จังหวัด ไม่ไปไม่รู้ - มนต์เสน่ห์แห่งสยาม</p>
+            <div class="flex justify-center gap-4 text-xl">
+                <a href="#" class="hover:text-white transition"><i class="fa-brands fa-facebook"></i></a>
+                <a href="#" class="hover:text-white transition"><i class="fa-brands fa-instagram"></i></a>
+                <a href="#" class="hover:text-white transition"><i class="fa-brands fa-twitter"></i></a>
+            </div>
+            <p class="mt-8 text-sm">© 2026 Amazing Thailand, create by armmy meowkingkai🐈</p>
+        </div>
+    </footer>
+
+    <script>
+        // เปลี่ยนสี Navbar เมื่อ Scroll (อัปเดตสำหรับ Glassmorphism)
+        window.addEventListener('scroll', () => {
+            const nav = document.getElementById('navbar-box');
+            if (window.scrollY > 50) {
+                nav.classList.add('bg-thai-blue/95', 'border-transparent', 'shadow-lg');
+                nav.classList.remove('bg-white/10', 'border-white/20', 'shadow-sm');
+            } else {
+                nav.classList.remove('bg-thai-blue/95', 'border-transparent', 'shadow-lg');
+                nav.classList.add('bg-white/10', 'border-white/20', 'shadow-sm');
+            }
+        });
+
+        // Initialize Data
+        const filterContainer = document.getElementById('filter-container');
+        const cardsContainer = document.getElementById('cards-container');
+
+        // สร้างปุ่ม Filter
+        destinations.forEach(dest => {
+            const btn = document.createElement('button');
+            btn.className = `filter-btn whitespace-nowrap px-6 py-3 rounded-full bg-white text-gray-600 font-medium shadow border border-gray-200 transition transform hover:scale-105 focus:outline-none`;
+            btn.innerHTML = `${dest.icon} ${dest.region}`;
+            btn.onclick = () => filterCards(dest.id);
+            btn.dataset.id = dest.id;
+            filterContainer.appendChild(btn);
+        });
+
+        // ฟังก์ชันสร้าง UI ของการ์ด
+        function createCardHTML(dest) {
+            return `
+                <div class="bg-white rounded-3xl overflow-hidden shadow-lg border border-gray-100 card-hover flex flex-col h-full fade-in">
+                    <div class="relative h-64 overflow-hidden group">
+                        <img src="${dest.img}" alt="${dest.name}" class="w-full h-full object-cover transition duration-700 group-hover:scale-110">
+                        <div class="absolute top-4 left-4 ${dest.color} text-white px-3 py-1 rounded-full text-sm font-semibold shadow-md flex items-center gap-1">
+                            ${dest.icon} ${dest.region}
+                        </div>
+                        <div class="absolute bottom-0 left-0 w-full bg-gradient-to-t from-black/80 to-transparent p-6 pt-12">
+                            <h3 class="text-2xl font-bold text-white mb-1">จ.${dest.name}</h3>
+                            <p class="text-thai-goldlight text-sm italic">"${dest.slogan}"</p>
+                        </div>
+                    </div>
+                    
+                    <div class="p-6 flex-grow flex flex-col gap-4">
+                        <div class="flex items-center gap-2 text-sm text-gray-600 bg-gray-50 p-2 rounded-lg">
+                            <i class="fa-regular fa-calendar-check text-thai-blue w-5"></i>
+                            <span class="font-medium">ช่วงน่าเที่ยว:</span> ${dest.time}
+                        </div>
+                        
+                        <div>
+                            <h4 class="font-bold text-gray-800 flex items-center gap-2 mb-2">
+                                <i class="fa-solid fa-map-location-dot text-thai-green"></i> ไฮไลท์ห้ามพลาด
+                            </h4>
+                            <ul class="text-sm text-gray-600 space-y-1 pl-6 list-disc marker:text-thai-green">
+                                ${dest.attractions.map(attr => `<li>${attr}</li>`).join('')}
+                            </ul>
+                        </div>
+                        
+                        <div>
+                            <h4 class="font-bold text-gray-800 flex items-center gap-2 mb-2">
+                                <i class="fa-solid fa-utensils text-orange-500"></i> เมนูเด็ด
+                            </h4>
+                            <div class="flex flex-wrap gap-2">
+                                ${dest.food.map(f => `<span class="bg-orange-50 text-orange-700 px-2 py-1 rounded text-xs border border-orange-100">${f}</span>`).join('')}
+                            </div>
+                        </div>
+                        
+                        <div class="mt-auto pt-4 border-t border-gray-100 space-y-4">
+                            <div>
+                                <h4 class="font-bold text-gray-800 flex items-center gap-2 mb-2 text-sm">
+                                    <i class="fa-solid fa-bed text-purple-500"></i> แนะนำที่พัก
+                                </h4>
+                                <p class="text-xs text-gray-500 leading-relaxed">
+                                    ${dest.lodging.join(' • ')}
+                                </p>
+                            </div>
+                            
+                            <a href="https://www.google.com/maps/dir/?api=1&destination=${dest.lat},${dest.lng}" target="_blank" class="w-full block text-center bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold py-2 rounded-lg transition text-sm">
+                                <i class="fa-solid fa-diamond-turn-right text-blue-500 mr-1"></i> นำทางไปที่นี่ (Google Maps)
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // ฟังก์ชัน Filter กรองข้อมูล
+        function filterCards(regionId) {
+            // Update Active Button Style
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                if (btn.dataset.id === regionId || (regionId === 'all' && btn.id === 'btn-all')) {
+                    btn.classList.remove('bg-white', 'text-gray-600');
+                    btn.classList.add('bg-thai-blue', 'text-white');
+                } else {
+                    btn.classList.add('bg-white', 'text-gray-600');
+                    btn.classList.remove('bg-thai-blue', 'text-white');
+                }
+            });
+
+            // Filter Data
+            cardsContainer.innerHTML = '';
+            const filtered = regionId === 'all' ? destinations : destinations.filter(d => d.id === regionId);
+            
+            filtered.forEach(dest => {
+                cardsContainer.innerHTML += createCardHTML(dest);
+            });
+        }
+
+        // โหลดข้อมูลทั้งหมดในครั้งแรก
+        filterCards('all');
+
+        // Logic สำหรับ AI Planner Form
+        document.getElementById('ai-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const region = document.getElementById('ai-region').value;
+            const style = document.getElementById('ai-style').value;
+            const days = document.getElementById('ai-days').value;
+            const errorDiv = document.getElementById('ai-error');
+            const errorText = document.getElementById('ai-error-text');
+            
+            // Hide error message initially
+            errorDiv.classList.add('hidden');
+
+            if (!region || !style || !days) {
+                errorText.textContent = 'กรุณาเลือกจุดหมายปลายทาง สไตล์การท่องเที่ยว และระยะเวลาให้ครบถ้วน';
+                errorDiv.classList.remove('hidden');
+                return;
+            }
+
+            // ซ่อนผลลัพธ์เก่า แสดง Loading
+            document.getElementById('ai-result').classList.add('hidden');
+            document.getElementById('ai-loading').classList.remove('hidden');
+
+            // จำลองเวลาประมวลผลของ AI (1.5 วินาที)
+            setTimeout(() => {
+                document.getElementById('ai-loading').classList.add('hidden');
+                
+                // หา object ของจังหวัดที่เลือก
+                const destData = destinations.find(d => d.name === region);
+                let planContent = '';
+
+                // Mock Response อิงตาม Style ที่เลือก (อัปเดตให้รองรับจำนวนวัน)
+                if (style === 'nature') {
+                    planContent = `
+                        <p><strong>ทริปสัมผัสธรรมชาติ จ.${region} (${days}) 🌿</strong></p>
+                        <p>ช่วงเวลาที่ดีที่สุดคือ ${destData.time} เตรียมเสื้อผ้าให้พร้อม!</p>
+                        <ul class="list-disc pl-5 mt-2 space-y-2">
+                            <li><strong>ไฮไลท์:</strong> ไปสูดอากาศบริสุทธิ์ที่ ${destData.attractions[0]} และแวะ ${destData.attractions[1] || 'จุดชมวิวธรรมชาติ'}</li>
+                            <li><strong>มื้ออร่อย:</strong> อย่าลืมแวะชิม ${destData.food[0]}</li>
+                            <li><strong>พักผ่อน:</strong> เสนอให้พักที่ ${destData.lodging[0]} เพื่อดื่มด่ำธรรมชาติอย่างเต็มที่</li>
+                        </ul>
+                    `;
+                } else if (style === 'food') {
+                    planContent = `
+                        <p><strong>ทริปตะลุยชิมของอร่อย จ.${region} (${days}) 🍜</strong></p>
+                        <p>สายกินห้ามพลาด! จัดเต็มกับของอร่อยท้องถิ่น</p>
+                        <ul class="list-disc pl-5 mt-2 space-y-2">
+                            <li><strong>ต้องลอง:</strong> <strong>${destData.food[0]}</strong> รสชาติต้นตำรับ และ <strong>${destData.food[1]}</strong></li>
+                            <li><strong>ย่อยอาหาร:</strong> เดินเที่ยวชิลๆ ถ่ายรูปที่ ${destData.attractions[0]}</li>
+                            <li><strong>ดินเนอร์:</strong> นั่งพักผ่อนรับลม พร้อมทาน <strong>${destData.food[2] || 'อาหารพื้นเมืองเด็ดๆ'}</strong></li>
+                        </ul>
+                        <p class="mt-2 text-sm text-gray-500">*แนะนำให้หาที่พักใกล้แหล่งของกิน เช่น ${destData.lodging[0]}</p>
+                    `;
+                } else {
+                    planContent = `
+                        <p><strong>ทริปไฮไลท์ จ.${region} สไตล์คุณ (${days}) ✨</strong></p>
+                        <p>${destData.slogan}</p>
+                        <p class="mt-2">แวะเช็คอินแลนด์มาร์คสำคัญ: ${destData.attractions.join(', ')}</p>
+                        <p class="mt-2">อาหารเด็ดห้ามพลาด: ${destData.food.join(', ')}</p>
+                        <p class="mt-2">แนะนำที่พักฟินๆ: ${destData.lodging[0]} หรือ ${destData.lodging[1] || 'รีสอร์ทสวยๆ'}</p>
+                        <p class="mt-4 font-semibold text-thai-green">"เดินทางปลอดภัยและสนุกกับทริปนะครับ!"</p>
+                    `;
+                }
+
+                document.getElementById('ai-response-content').innerHTML = planContent;
+                document.getElementById('ai-result').classList.remove('hidden');
+                
+                // Scroll ไปที่ผลลัพธ์
+                document.getElementById('ai-result').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+
+            }, 1500);
+        });
+
+        let map;
+
+        // ฟังก์ชันสร้างแผนที่เริ่มต้น
+        function initMap() {
+            // ตั้งค่าจุดศูนย์กลางอยู่ที่ประเทศไทย (ประมาณ)
+            map = L.map('thailand-map').setView([13.736717, 100.523186], 5);
+
+            // ใช้แผนที่ OpenStreetMap (ฟรี ไม่ต้องใช้ API Key)
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+                maxZoom: 18
+            }).addTo(map);
+
+            // วนลูปสร้าง Marker สำหรับทุกจังหวัด
+            destinations.forEach(dest => {
+                // สร้าง Custom Icon เล็กๆ ตามอีโมจิ
+                const customIcon = L.divIcon({
+                    className: 'custom-div-icon',
+                    html: `<div style="background-color: white; border: 2px solid #1E3A8A; border-radius: 50%; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; font-size: 16px; box-shadow: 0 4px 6px rgba(0,0,0,0.3);">${dest.icon}</div>`,
+                    iconSize: [30, 30],
+                    iconAnchor: [15, 15]
+                });
+
+                const marker = L.marker([dest.lat, dest.lng], {icon: customIcon}).addTo(map);
+                
+                // สร้าง Popup
+                const popupContent = `
+                    <div class="text-center p-1">
+                        <h4 class="font-bold text-lg mb-1">จ.${dest.name}</h4>
+                        <p class="text-xs text-gray-600 mb-2">${dest.slogan}</p>
+                        <a href="https://www.google.com/maps/dir/?api=1&destination=${dest.lat},${dest.lng}" target="_blank" class="inline-block bg-thai-blue text-white text-xs px-3 py-1.5 rounded shadow hover:bg-blue-800 transition">
+                            <i class="fa-solid fa-location-arrow"></i> เปิดใน Google Maps
+                        </a>
+                    </div>
+                `;
+                marker.bindPopup(popupContent);
+            });
+        }
+
+        // โหลดแผนที่หลังจากหน้าเว็บพร้อม
+        window.addEventListener('DOMContentLoaded', (event) => {
+            initMap();
+        });
+
+    </script>
+</body>
+</html>
